@@ -26,42 +26,29 @@
  * 
  * For more information, please refer to <http://unlicense.org/>
  * 
- * @category
- * @package
+ * @package    SlmCmfKernel
  * @copyright  Copyright (c) 2009-2011 Soflomo (http://www.soflomo.com)
  * @license    http://unlicense.org Unlicense
  */
 
-namespace SlmCmfBase\Listener;
+namespace SlmCmfKernel\Repository;
 
-use Zend\Mvc\MvcEvent,
-    DoctrineORMModule\Factory\EntityManager;
+use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use Zend\EventManager\EventManagerInterface;
 
 /**
- * Description of Listener
+ * Description of Page
  *
- * @package    
- * @subpackage 
+ * @package    SlmCmfKernel
+ * @subpackage Repository 
  * @author     Jurian Sluiman <jurian@soflomo.com>
  */
-class LoadPageFromRouteMatch
+class Page extends NestedTreeRepository
 {
-    protected $em;
+    protected $events;
     
-    public function __construct (EntityManager $em)
+    public function setEventManager(EventManagerInterface $events)
     {
-        $this->em     = $em;
-    }
-    
-    public function __invoke (MvcEvent $e)
-    {
-        $match  = $e->getRouteMatch();
-        $pageId = $match->getParam('page-id', null);
-
-        if (null !== $pageId && is_numeric($pageId)) {
-            $page = $this->em->find('SlmCmfBase\Entity\Page', $pageId);
-
-            $e->setParam('page', $page);
-        }
+        $this->events = $events;
     }
 }

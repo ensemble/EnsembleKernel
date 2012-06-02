@@ -1,22 +1,25 @@
 <?php
 
-namespace SlmCmfBase;
+namespace SlmCmfKernel;
 
-use Zend\Module\Manager,
-    Zend\EventManager\StaticEventManager,
-    Zend\EventManager\Event,
-    Zend\Module\Consumer\AutoloaderProvider;
+use Zend\ModuleManager\Feature;
+use Zend\EventManager\Event;
 
-class Module implements AutoloaderProvider
+use SlmCmfKernel\Listener;
+use SlmCmfKernel\Router\Parser;
+
+class Module implements
+    Feature\InitProviderInterface,
+    Feature\AutoloaderProviderInterface,
+    Feature\ServiceProviderInterface,
+    Feature\ConfigProviderInterface,
+    Feature\BootstrapListenerInterface
 {
-    protected $config;
+    protected $options;
 
-    public function init(Manager $moduleManager)
+    public function init($manager = null)
     {
-        $events = StaticEventManager::getInstance();
-        $events->attach('bootstrap', 'bootstrap', array($this, 'addRouterListener'));
-
-        $moduleManager->events()->attach('loadModules.post', array($this, 'modulesLoaded'));
+        $manager->events()->attach('loadModules.post', array($this, 'modulesLoaded'));
     }
     
     public function getAutoloaderConfig()
@@ -33,29 +36,74 @@ class Module implements AutoloaderProvider
         );
     }
     
+    public function getServiceConfiguration()
+    {
+        return array(
+            'factories' => array(
+                'slmCmfAddRoutesListener' => function ($sm) {
+                    $di = $sm->get('Di');
+                    $em = $di->get('doctrine_em');
+                    
+                    $repository = $em->getRepository('SlmCmfKernel\Entity\Page');
+                    $parser     = $sm->get('slmCmfRouteParser');
+                    $events     = $sm->get('EventManager');
+                    $events->setIdentifiers(array(
+                        __CLASS__,
+                        get_class($repository),
+                        'SlmCmfKernel\Listener\AddRoutesFromDb'
+                    ));
+                    $repository->setEventManager($events);
+                    
+                    $listener   = new Listener\AddRoutesFromDb($repository, $parser, $events);
+                    return $listener;
+                },
+                'slmCmfLoadPageListener' => function ($sm) {
+                    $di = $sm->get('Di');
+                    $em = $di->get('doctrine_em');
+                    
+                    $listener = new Listener\LoadPageFromRouteMatch($em);
+                    return $listener;
+                },
+                'slmCmfRouteParser' => function ($sm) {
+                    $config = $sm->get('config');
+                    $routes = $config['cmf_routes'];
+                    
+                    $parser = new Parser($routes);
+                    return $parser;
+                }
+            ),
+        );
+    }
+    
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
     }
+    
+    public function onBootstrap(Event $e)
+    {
+        $this->attachListeners($e);
+    }
 
     public function modulesLoaded(Event $e)
     {
-        $config = $e->getConfigListener()->getMergedConfig();
-        $this->config = $config['slmcmfbase'];
+        $options = $e->getConfigListener()->getMergedConfig();
+        $this->options = $options['slmcmfkernel'];
     }
     
-    public function addRouterListener(Event $e)
+    public function attachListeners(Event $e)
     {
-        $app     = $e->getParam('application');
-        $locator = $app->getLocator();
+        $app = $e->getParam('application');
+        $sm  = $app->getServiceManager();
+        $em  = $app->events();
 
-        if ($this->config['load_routes']) {
-            $routerListener = $locator->get('SlmCmfBase\Listener\AddRoutesFromDb');
-            $app->events()->attach('route', $routerListener, 1000);
+        if ($this->options['load_routes']) {
+            $routerListener = $sm->get('slmCmfAddRoutesListener');
+            $em->attach('route', $routerListener, 1000);
 
-            if ($this->config['load_page']) {
-               $pageListener   = $locator->get('SlmCmfBase\Listener\LoadPageFromRouteMatch');
-               $app->events()->attach('dispatch', $pageListener, 1000);
+            if ($this->options['load_page']) {
+               $pageListener   = $sm->get('slmCmfLoadPageListener');
+               $em->attach('dispatch', $pageListener, 1000);
             }
         }
     }

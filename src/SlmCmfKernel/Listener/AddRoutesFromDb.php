@@ -26,24 +26,26 @@
  * 
  * For more information, please refer to <http://unlicense.org/>
  * 
- * @category
- * @package
+ * @package    SlmCmfKernel
  * @copyright  Copyright (c) 2009-2011 Soflomo (http://www.soflomo.com)
  * @license    http://unlicense.org Unlicense
  */
 
-namespace SlmCmfBase\Listener;
+namespace SlmCmfKernel\Listener;
 
-use Zend\Mvc\MvcEvent,
-    Doctrine\ORM\EntityManager,
-    SlmCmfBase\Router\Parser,
-    Zend\Cache\Storage\Adapter as Cache;
+use Zend\Mvc\MvcEvent;
+
+use SlmCmfKernel\Repository\Page as Repository;
+use SlmCmfKernel\Router\Parser;
+use Zend\EventManager\EventManagerInterface;
+
+use Zend\Cache\Storage\Adapter as Cache;
 
 /**
  * Description of Listener
  *
- * @package    
- * @subpackage 
+ * @package    SlmCmfKernel
+ * @subpackage Listener
  * @author     Jurian Sluiman <jurian@soflomo.com>
  */
 class AddRoutesFromDb
@@ -52,9 +54,9 @@ class AddRoutesFromDb
     
     /**
      *
-     * @var EntityManager
+     * @var Repository
      */
-    protected $em;
+    protected $repository;
     
     /**
      *
@@ -64,14 +66,21 @@ class AddRoutesFromDb
     
     /**
      *
+     * @var EventManagerInterface
+     */
+    protected $events;
+    
+    /**
+     *
      * @var Cache
      */
     protected $cache;
     
-    public function __construct (EntityManager $em, Parser $parser)
+    public function __construct (Repository $repository, Parser $parser, EventManagerInterface $events)
     {
-        $this->em     = $em;
-        $this->parser = $parser;
+        $this->repository = $repository;
+        $this->parser     = $parser;
+        $this->events     = $events;
     }
     
     public function setCache (Cache $cache)
@@ -82,7 +91,7 @@ class AddRoutesFromDb
     public function __invoke (MvcEvent $e)
     {
         if (null === $this->cache || false !== ($routes = $this->cache->getItem(self::CACHE_KEY))) {
-            $pages  = $this->em->getRepository('SlmCmfBase\Entity\Page')->getRootNodes();
+            $pages  = $this->repository->getRootNodes();
             $routes = $this->parser->parse($pages);
             
             if (null !== $this->cache) {

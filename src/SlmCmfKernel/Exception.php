@@ -1,5 +1,5 @@
 <?php
-namespace SlmCmfBase;
+namespace SlmCmfKernel;
 
 interface Exception
 {}

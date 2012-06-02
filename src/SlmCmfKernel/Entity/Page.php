@@ -1,6 +1,6 @@
 <?php
 
-namespace SlmCmfBase\Entity;
+namespace SlmCmfKernel\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection,
     Doctrine\ORM\Mapping as ORM,
@@ -8,8 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection,
 
 /**
  * @Gedmo\Tree(type="nested")
- * @ORM\Table(name="pages")
- * @ORM\Entity(repositoryClass="Gedmo\Tree\Entity\Repository\NestedTreeRepository")
+ * @ORM\Table(name="page")
+ * @ORM\Entity(repositoryClass="SlmCmfKernel\Repository\Page")
  */
 class Page
 {
@@ -51,25 +51,18 @@ class Page
 
     /**
      * @Gedmo\TreeParent
-     * @ORM\ManyToOne(targetEntity="SlmCmfBase\Entity\Page", inversedBy="children")
+     * @ORM\ManyToOne(targetEntity="SlmCmfKernel\Entity\Page", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="SET NULL")
      * @var Page
      */
     protected $parent;
 
     /**
-     * @ORM\OneToMany(targetEntity="SlmCmfBase\Entity\Page", mappedBy="parent")
+     * @ORM\OneToMany(targetEntity="SlmCmfKernel\Entity\Page", mappedBy="parent")
      * @ORM\OrderBy({"lft" = "ASC"})
      * @var ArrayCollection
      */
     protected $children;
-
-    /**
-     * @ORM\OneToOne(targetEntity="SlmCmfBase\Entity\MetaData")
-     * @ORM\JoinColumn(name="id", referencedColumnName="id")
-     * @var MetaData
-     */
-    protected $metadata;
 
     /**
      * @ORM\Column(type="string")
@@ -88,12 +81,6 @@ class Page
      * @var string
      */
     protected $moduleId;
-
-    /**
-     * @ORM\Column(type="boolean")
-     * @var bool
-     */
-    protected $visible;
 
     public function __construct ()
     {
@@ -170,19 +157,20 @@ class Page
         $this->children = $children;
     }
 
-    public function getMetadata ()
+    public function getRoute ($includeParent = false)
     {
-        return $this->metadata;
-    }
-
-    public function setMetadata (MetaData $metadata)
-    {
-        $this->metadata = $metadata;
-    }
-
-    public function getRoute ()
-    {
-        return $this->route;
+        if (false === $includeParent) {
+            return $this->route;
+        }
+        
+        $page  = $this;
+        $route = array();
+        do {
+            $route[] = $page->getRoute(false);
+        } while (($page = $page->getParent()) instanceof self);
+        
+        $route = array_reverse($route);
+        return implode('/', $route);
     }
 
     public function setRoute ($route)
@@ -208,25 +196,5 @@ class Page
     public function setModuleId ($moduleId)
     {
         $this->moduleId = $moduleId;
-    }
-
-    public function getVisible ()
-    {
-        return $this->visible;
-    }
-
-    public function setVisible ($visible)
-    {
-        $this->visible = $visible;
-    }
-
-    public function getDomain ()
-    {
-        return $this->domain;
-    }
-
-    public function setDomain ($domain)
-    {
-        $this->domain = $domain;
     }
 }

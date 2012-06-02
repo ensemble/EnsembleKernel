@@ -1,7 +1,7 @@
 <?php
-namespace SlmCmfBase\Exception;
+namespace SlmCmfKernel\Exception;
 
-use SlmCmfBase\Exception;
+use SlmCmfKernel\Exception;
 
 class InvalidArgumentException extends \InvalidArgumentException
     implements Exception
