@@ -33,8 +33,9 @@
 
 namespace SlmCmfKernel\Listener;
 
-use Zend\Mvc\MvcEvent,
-    DoctrineORMModule\Factory\EntityManager;
+use Zend\Mvc\MvcEvent;
+
+use SlmCmfKernel\Repository\Page as Repository;
 
 /**
  * Description of Listener
@@ -45,11 +46,11 @@ use Zend\Mvc\MvcEvent,
  */
 class LoadPageFromRouteMatch
 {
-    protected $em;
+    protected $repository;
     
-    public function __construct (EntityManager $em)
+    public function __construct (Repository $repository)
     {
-        $this->em     = $em;
+        $this->repository = $repository;
     }
     
     public function __invoke (MvcEvent $e)
@@ -58,7 +59,7 @@ class LoadPageFromRouteMatch
         $pageId = $match->getParam('page-id', null);
 
         if (null !== $pageId && is_numeric($pageId)) {
-            $page = $this->em->find('SSlmCmfKernel\Entity\Page', $pageId);
+            $page = $this->repository->find($pageId);
 
             $e->setParam('page', $page);
         }

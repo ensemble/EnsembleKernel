@@ -61,7 +61,8 @@ class Module implements
                     $di = $sm->get('Di');
                     $em = $di->get('doctrine_em');
                     
-                    $listener = new Listener\LoadPageFromRouteMatch($em);
+                    $repository = $em->getRepository('SlmCmfKernel\Entity\Page');
+                    $listener   = new Listener\LoadPageFromRouteMatch($repository);
                     return $listener;
                 },
                 'slmCmfRouteParser' => function ($sm) {
