@@ -55,6 +55,14 @@ class Module implements
                     $repository->setEventManager($events);
                     
                     $listener   = new Listener\AddRoutesFromDb($repository, $parser, $events);
+                    
+                    $config  = $sm->get('config');
+                    if (true === $config['slmcmf_kernel']['cache']) {
+                        $key   = $config['slmcmf_kernel']['cache_key'];
+                        $cache = $sm->get($key);
+                        $listener->setCache($cache);
+                    }
+                    
                     return $listener;
                 },
                 'slmCmfLoadPageListener' => function ($sm) {
@@ -89,7 +97,7 @@ class Module implements
     public function modulesLoaded(Event $e)
     {
         $options = $e->getConfigListener()->getMergedConfig();
-        $this->options = $options['slmcmfkernel'];
+        $this->options = $options['slmcmf_kernel'];
     }
     
     public function attachListeners(Event $e)

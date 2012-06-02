@@ -39,7 +39,7 @@ use SlmCmfKernel\Repository\Page as Repository;
 use SlmCmfKernel\Router\Parser;
 use Zend\EventManager\EventManagerInterface;
 
-use Zend\Cache\Storage\Adapter as Cache;
+use Zend\Cache\Storage\Adapter\AdapterInterface as Cache;
 
 /**
  * Description of Listener
@@ -50,7 +50,7 @@ use Zend\Cache\Storage\Adapter as Cache;
  */
 class AddRoutesFromDb
 {
-    const CACHE_KEY = 'SlmCmfBase\Listener\AddRoutesFromDb';
+    const CACHE_KEY = 'SlmCmfBase_Listener_AddRoutesFromDb';
     
     /**
      *
@@ -90,7 +90,7 @@ class AddRoutesFromDb
     
     public function __invoke (MvcEvent $e)
     {
-        if (null === $this->cache || false !== ($routes = $this->cache->getItem(self::CACHE_KEY))) {
+        if (null === $this->cache || null === ($routes = $this->cache->getItem(self::CACHE_KEY))) {
             $pages  = $this->repository->getRootNodes();
             $routes = $this->parser->parse($pages);
             

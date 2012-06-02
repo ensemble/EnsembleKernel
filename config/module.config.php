@@ -1,8 +1,10 @@
 <?php
 return array(
-    'slmcmfkernel' => array(
+    'slmcmf_kernel' => array(
         'load_routes' => true,
         'load_page'   => false,
+        'cache'       => false,
+        'cache_key'   => 'cache'
     ),
     
     'di' => array(
