@@ -1,0 +1,30 @@
+{
+    "name": "slm-cmf/kernel",
+    "description": "CMF Kernel for the SLM content management system",
+    "type": "library",
+    "license": "Unlicense",
+    "keywords": [
+        "cmf",
+        "zf2"
+    ],
+    "homepage": "https://github.com/juriansluiman/SlmCmfKernel",
+    "authors": [
+        {
+            "name": "Jurian Sluiman",
+            "email": "jurian@juriansluiman.nl",
+            "homepage": "http://juriansluiman.nl/"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zendframework": "dev-master",
+        "doctrine/DoctrineORMModule": "dev-master",
+        "gedmo/doctrine-extensions": "dev-master",
+        "slm-cmf/utils": "dev-master"
+    },
+    "autoload": {
+        "classmap": [
+            "./"
+        ]
+    }
+}
