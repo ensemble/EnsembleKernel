@@ -59,7 +59,7 @@ class Module implements
         // Parse page tree for routes and navigation structure
         $routeListener      = $sm->get('SlmCmfKernel\Listener\Parse\ParseRoutes');
         $navigationListener = $sm->get('SlmCmfKernel\Listener\Parse\ParseNavigation');
-        $em->attach('SlmCmfKernel', 'parsePages', $routeListener);
-        $em->attach('SlmCmfKernel', 'parsePages', $navigationListener);
+        $em->attach('SlmCmfKernel', 'parse', $routeListener);
+        $em->attach('SlmCmfKernel', 'parse', $navigationListener);
     }
 }

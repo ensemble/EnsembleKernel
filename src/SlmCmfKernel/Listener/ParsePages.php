@@ -60,10 +60,10 @@ class ParsePages
     
     public function __invoke(MvcEvent $e)
     {
-        $this->parsePages($e);
+        $this->parse($e);
     }
     
-    public function parsePages(MvcEvent $e)
+    public function parse(MvcEvent $e)
     {
         $event  = clone($e);
         $event->setName(__FUNCTION__);
