@@ -45,6 +45,7 @@ interface PageInterface
     
     public function getParent();
     public function getChildren();
+    public function hasChildren();
     
     public function getRoute($includeParentRoute = false);
     public function setRoute($route);
