@@ -73,8 +73,7 @@ class Navigation
             $navPage = $this->parsePage($page);
             
             if ($page->hasChildren()) {
-                $children   = $page->getChildren()->toArray();
-                $collection = new PageCollection($children);
+                $collection = $page->getChildren();
                 $navChilds  = $this->parse($collection);
                 
                 $navPage->addPages($navChilds);

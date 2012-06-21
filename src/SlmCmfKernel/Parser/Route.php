@@ -70,8 +70,7 @@ class Route
             $routes[$page->getId()] = $route;
             
             if ($page->hasChildren()) {
-                $children    = $page->getChildren()->toArray();
-                $collection  = new PageCollection($children);
+                $collection  = $page->getChildren();
                 $childRoutes = $this->parse($collection);
                 
                 $routes += $childRoutes;
