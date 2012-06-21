@@ -26,76 +26,40 @@
  * 
  * For more information, please refer to <http://unlicense.org/>
  * 
- * @package
+ * @package    SlmCmfKernel
  * @copyright  Copyright (c) 2009-2012 Soflomo (http://soflomo.com)
  * @license    http://unlicense.org Unlicense
  */
 
-namespace SlmCmfKernel\Listener;
+namespace SlmCmfKernel\Service;
 
-use Zend\EventManager\EventManagerInterface as EventManager;
-use Zend\EventManager\Event;
-use Zend\Mvc\MvcEvent;
-
+use SlmCmfKernel\Model\PageCollectionInterface as PageCollection;
 use SlmCmfKernel\Model\PageInterface as Page;
-use SlmCmfKernel\Service\PageInterface as PageService;
-use SlmCmfKernel\Exception;
 
 /**
- * Description of ParsePages
+ * Interface for access to repository and mapper features
  */
-class LoadPage
+interface PageInterface
 {
     /**
-     * @var EventManager
+     * Find page based on id
+     * 
+     * @param  int $id
+     * @return Page 
      */
-    protected $events;
+    public function find($id);
     
     /**
-     * @var PageService
+     * Find all pages
+     * 
+     * @return PageCollection 
      */
-    protected $pageService;
+    public function findAll();
     
-    public function setEventManager(EventManager $eventManager)
-    {
-        $eventManager->setIdentifiers(array(
-            __CLASS__,
-            get_called_class(),
-            'SlmCmfKernel',
-        ));
-        $this->events = $eventManager;
-    }
-    
-    public function setPageService(PageService $service)
-    {
-        $this->pageService = $service;
-    }
-    
-    public function __invoke(MvcEvent $e)
-    {
-        $this->loadPage($e);
-    }
-    
-    public function loadPage(MvcEvent $e)
-    {
-        $routeMatch = $e->getRouteMatch();
-        $pageId     = $routeMatch->getParam('page-id', null);
-        
-        if (null === $pageId) {
-            return;
-        }
-        
-        $page = $this->pageService->find($pageId);
-        if (!$page instanceof Page) {
-            throw new Exception\PageNotFoundException(sprintf(
-                'The page could not be found with id %s',
-                $pageId
-            ));
-        }
-        
-        $event = new Event(__FUNCTION__, $this, array('page' => $page));
-        $this->events->trigger($event);
-        
-        $e->setParam('page', $page);
-    }
+    /**
+     * Find all pages, parsed into a tree
+     * 
+     * @return PageCollection
+     */
+    public function getTree();
 }

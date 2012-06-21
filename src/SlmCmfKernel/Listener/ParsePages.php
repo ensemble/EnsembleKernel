@@ -36,13 +36,26 @@ namespace SlmCmfKernel\Listener;
 use Zend\EventManager\EventManagerInterface as EventManager;
 use Zend\Mvc\MvcEvent;
 use Zend\EventManager\Event;
+
 use SlmCmfKernel\Model\PageCollectionInterface as PageCollection;
+use SlmCmfKernel\Service\PageInterface as PageService;
+use SlmCmfKernel\Exception;
 
 /**
  * Description of ParsePages
  */
 class ParsePages
 {
+    /**
+     * @var EventManager
+     */
+    protected $events;
+    
+    /**
+     * @var PageService
+     */
+    protected $pageService;
+    
     /**
      * @var PageCollection
      */
@@ -56,6 +69,11 @@ class ParsePages
             'SlmCmfKernel',
         ));
         $this->events = $eventManager;
+    }
+    
+    public function setPageService(PageService $service)
+    {
+        $this->pageService = $service;
     }
     
     public function __invoke(MvcEvent $e)
@@ -78,20 +96,9 @@ class ParsePages
             return $this->pageCollection;
         }
         
-        $event = new Event;
-        $event->setName(__FUNCTION__);
-        $event->setTarget($this);
-        
-        $result = $this->events->trigger($event, function($r) {
-            if ($r instanceof PageCollection) {
-                return true;
-            }
-            return false;
-        });
-        $pages  = $result->last();
-        
+        $pages  = $this->pageService->getTree();
         if (!$pages instanceof PageCollection) {
-            throw new \Exception('Collection not found');
+            throw new Exception\PageNotFoundException('Collection not found');
         }
         
         $this->pageCollection = $pages;

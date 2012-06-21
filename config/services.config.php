@@ -34,21 +34,43 @@
 use SlmCmfKernel\Listener;
 use SlmCmfKernel\Parser;
 
+use SlmCmfKernel\Exception;
+
 return array(
     'factories' => array(
         'SlmCmfKernel\Listener\ParsePages' => function ($sm) {
+            $config   = $sm->get('config');
+            $config   = $config['slmcmf_kernel'];
+            if (empty($config['page_service_class'])) {
+                throw new Exception\PageServiceNotFoundException(
+                    'No service manager key provided for an service adapter'
+                );
+            }
+            
+            $service  = $sm->get($config['page_service_class']);
             $events   = $sm->get('EventManager');
             
             $listener = new Listener\ParsePages;
             $listener->setEventManager($events);
+            $listener->setPageService($service);
             
             return $listener;
         },
         'SlmCmfKernel\Listener\LoadPage' => function ($sm) {
+            $config   = $sm->get('config');
+            $config   = $config['slmcmf_kernel'];
+            if (empty($config['page_service_class'])) {
+                throw new Exception\PageServiceNotFoundException(
+                    'No service manager key provided for an service adapter'
+                );
+            }
+            
+            $service  = $sm->get($config['page_service_class']);
             $events   = $sm->get('EventManager');
             
             $listener = new Listener\LoadPage;
             $listener->setEventManager($events);
+            $listener->setPageService($service);
             
             return $listener;
         },
