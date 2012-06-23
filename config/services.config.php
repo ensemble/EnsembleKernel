@@ -33,12 +33,13 @@
 
 use SlmCmfKernel\Listener;
 use SlmCmfKernel\Parser;
+use SlmCmfKernel\Service;
 
 use SlmCmfKernel\Exception;
 
 return array(
     'factories' => array(
-        'SlmCmfKernel\Listener\ParsePages' => function ($sm) {
+        'SlmCmfKernel\Service\Page' => function ($sm) {
             $config   = $sm->get('config');
             $config   = $config['slmcmf_kernel'];
             if (empty($config['page_service_class'])) {
@@ -48,6 +49,16 @@ return array(
             }
             
             $service  = $sm->get($config['page_service_class']);
+            
+            if (!$service instanceof Service\PageInterface) {
+                throw new Exception\PageServiceNotFoundException(
+                    'Instance of service adapter does not implement SlmCmfKernel\Service\PageInterface'
+                );
+            }
+            return $service;
+        },
+        'SlmCmfKernel\Listener\ParsePages' => function ($sm) {
+            $service  = $sm->get('SlmCmfKernel\Service\Page');
             $events   = $sm->get('EventManager');
             
             $listener = new Listener\ParsePages;
@@ -57,15 +68,7 @@ return array(
             return $listener;
         },
         'SlmCmfKernel\Listener\LoadPage' => function ($sm) {
-            $config   = $sm->get('config');
-            $config   = $config['slmcmf_kernel'];
-            if (empty($config['page_service_class'])) {
-                throw new Exception\PageServiceNotFoundException(
-                    'No service manager key provided for an service adapter'
-                );
-            }
-            
-            $service  = $sm->get($config['page_service_class']);
+            $service  = $sm->get('SlmCmfKernel\Service\Page');
             $events   = $sm->get('EventManager');
             
             $listener = new Listener\LoadPage;
