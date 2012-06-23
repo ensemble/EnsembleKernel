@@ -47,19 +47,19 @@ class Module implements
         if ($config['pages_parse']) {
             $listener = $sm->get('SlmCmfKernel\Listener\ParsePages');
             $em->attach('route', $listener, 1000);
+            
+            if ($config['page_load']) {
+                $listener = $sm->get('SlmCmfKernel\Listener\LoadPage');
+                $em->attach('dispatch', $listener, 1000);
+            }
+
+            $em = $em->getSharedManager();
+
+            // Parse page tree for routes and navigation structure
+            $routeListener      = $sm->get('SlmCmfKernel\Listener\Parse\ParseRoutes');
+            $navigationListener = $sm->get('SlmCmfKernel\Listener\Parse\ParseNavigation');
+            $em->attach('SlmCmfKernel', 'parse', $routeListener);
+            $em->attach('SlmCmfKernel', 'parse', $navigationListener);
         }
-        
-        if ($config['page_load']) {
-            $listener = $sm->get('SlmCmfKernel\Listener\LoadPage');
-            $em->attach('dispatch', $listener, 1000);
-        }
-        
-        $em = $em->getSharedManager();
-        
-        // Parse page tree for routes and navigation structure
-        $routeListener      = $sm->get('SlmCmfKernel\Listener\Parse\ParseRoutes');
-        $navigationListener = $sm->get('SlmCmfKernel\Listener\Parse\ParseNavigation');
-        $em->attach('SlmCmfKernel', 'parse', $routeListener);
-        $em->attach('SlmCmfKernel', 'parse', $navigationListener);
     }
 }
