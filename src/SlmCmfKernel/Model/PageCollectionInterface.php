@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Ensemble\Kernel
- * @author      Jurian Sluiman <jurian@juriansluiman.nl>
+ * @author      Jurian Sluiman <jurian@soflomo.com>
  * @copyright   2012 Soflomo http://soflomo.com.
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://ensemble.github.com

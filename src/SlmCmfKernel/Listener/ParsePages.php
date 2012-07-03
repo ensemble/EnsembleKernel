@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Ensemble\Kernel
- * @author      Jurian Sluiman <jurian@juriansluiman.nl>
+ * @author      Jurian Sluiman <jurian@soflomo.com>
  * @copyright   2012 Soflomo http://soflomo.com.
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://ensemble.github.com
@@ -57,17 +57,17 @@ class ParsePages
      * @var EventManager
      */
     protected $events;
-    
+
     /**
      * @var PageService
      */
     protected $pageService;
-    
+
     /**
      * @var PageCollection
      */
     protected $pageCollection;
-    
+
     public function setEventManager(EventManager $eventManager)
     {
         $eventManager->setIdentifiers(array(
@@ -77,37 +77,37 @@ class ParsePages
         ));
         $this->events = $eventManager;
     }
-    
+
     public function setPageService(PageService $service)
     {
         $this->pageService = $service;
     }
-    
+
     public function __invoke(MvcEvent $e)
     {
         $this->parse($e);
     }
-    
+
     public function parse(MvcEvent $e)
     {
         $event  = clone($e);
         $event->setName(__FUNCTION__);
         $event->setTarget($this);
-        
+
         $this->events->trigger($event);
     }
-    
+
     public function getPageCollection()
     {
         if ($this->pageCollection instanceof PageCollection) {
             return $this->pageCollection;
         }
-        
+
         $pages  = $this->pageService->getTree();
         if (!$pages instanceof PageCollection) {
             throw new Exception\PageNotFoundException('Collection not found');
         }
-        
+
         $this->pageCollection = $pages;
         return $this->pageCollection;
     }

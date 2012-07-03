@@ -33,7 +33,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Ensemble\Kernel
- * @author      Jurian Sluiman <jurian@juriansluiman.nl>
+ * @author      Jurian Sluiman <jurian@soflomo.com>
  * @copyright   2012 Soflomo http://soflomo.com.
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://ensemble.github.com
@@ -53,26 +53,26 @@ use Zend\Mvc\MvcEvent as Event;
 class ParseNavigation
 {
     const CACHE_KEY = 'SlmCmfKernel_Listener_ParseNavigation';
-    
+
     protected $cache;
     protected $parser;
     protected $helper;
-    
+
     public function setCache(Cache $cache)
     {
         $this->cache = $cache;
     }
-    
+
     public function setParser(Parser $parser)
     {
         $this->parser = $parser;
     }
-    
+
     public function setViewHelper(Helper $helper)
     {
         $this->helper = $helper;
     }
-    
+
     public function __invoke(Event $e)
     {
         $router = $e->getRouter();
@@ -81,12 +81,12 @@ class ParseNavigation
         if (null === $this->cache || null === ($routes = $this->cache->getItem(self::CACHE_KEY))) {
             $collection = $e->getTarget()->getPageCollection();
             $navigation = $this->parser->parse($collection);
-            
+
             if (null !== $this->cache) {
                 $this->cache->setItem(self::CACHE_KEY, $navigation);
             }
         }
-        
+
         $this->helper->setContainer($navigation);
     }
 }
