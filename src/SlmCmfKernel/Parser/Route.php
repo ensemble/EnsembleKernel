@@ -53,11 +53,11 @@ use SlmCmfKernel\Exception;
 class Route
 {
     protected $routes;
-    
+
     /**
      * Add routes for module segments
-     * 
-     * @param array $routes 
+     *
+     * @param array $routes
      */
     public function setModuleRoutes(array $routes)
     {
@@ -66,7 +66,7 @@ class Route
 
     /**
      * Parse a PageCollection into a list of routes
-     * 
+     *
      * @param  PageCollection $pages
      * @return array
      */
@@ -76,34 +76,34 @@ class Route
         foreach ($pages as $page) {
             $route = $this->parsePage($page);
             $routes[$page->getId()] = $route;
-            
+
             if ($page->hasChildren()) {
                 $collection  = $page->getChildren();
                 $childRoutes = $this->parse($collection);
-                
+
                 $routes += $childRoutes;
             }
         }
 
         return $routes;
     }
-    
+
     /**
      * Parse a single page into a route configuration
-     * 
+     *
      * @param  Page $page
      * @return array
-     * @throws Exception\RuntimeException 
+     * @throws Exception\RuntimeException
      */
     public function parsePage(Page $page)
     {
         $module = $this->getModuleRoute($page->getModule());
-        
+
         $type = 'literal';
         if (isset($module['type'])) {
             $type = $module['type'];
         }
-        
+
         $route = $page->getRoute(true);
         $route = '/' . trim($route, '/');
         if (isset($module['options']['route'])) {
@@ -118,7 +118,7 @@ class Route
         }
         $defaults = array('page-id' => $page->getId())
                   + $module['options']['defaults'];
-        
+
         $route = array(
             'type' => $type,
             'options' => array(
@@ -127,21 +127,21 @@ class Route
             ),
             'may_terminate' => true
         );
-        
+
         if (isset($module['options']['constraints'])) {
             $route['options']['constraints'] = $module['options']['constraints'];
         }
-        
+
         if (isset($module['child_routes'])) {
             $route['child_routes'] = $module['child_routes'];
         }
-        
+
         return $route;
     }
 
     /**
      * Get config of route segments for module
-     * 
+     *
      * @param  string $name
      * @return array
      */

@@ -51,23 +51,39 @@ interface PageInterface
 {
     /**
      * Find page based on id
-     * 
+     *
      * @param  int $id
-     * @return Page 
+     * @return Page
      */
     public function find($id);
-    
-    /**
-     * Find all pages
-     * 
-     * @return PageCollection 
-     */
-    public function findAll();
-    
+
     /**
      * Find all pages, parsed into a tree
-     * 
+     *
      * @return PageCollection
      */
     public function getTree();
+
+    /**
+     * Persist a new page in the persistency layer
+     *
+     * @param  Page   $page Page to persist
+     * @return Page         The persisted page
+     */
+    public function persist(Page $page);
+
+    /**
+     * Update an existing page
+     *
+     * @param  Page   $page Page to update
+     * @return Page         The updated page
+     */
+    public function update(Page $page);
+
+    /**
+     * Delete a page
+     * @param  Page   $page Page to delete
+     * @return bool         True if page is deleted
+     */
+    public function delete(Page $page);
 }

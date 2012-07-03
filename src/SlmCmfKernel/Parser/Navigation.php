@@ -61,32 +61,32 @@ class Navigation
      * @var EventManager
      */
     protected $events;
-    
+
     public function setEventManager(EventManager $events)
     {
         $this->events = $events;
     }
-    
+
     /**
      * Parse a PageCollection into a navigation structure
-     * 
+     *
      * @param  PageCollection $pages
      * @return array
      */
     public function parse(PageCollectionInterface $pages, $returnArray = false)
     {
         $navigation = ($returnArray) ? array() : new Collection;
-        
+
         foreach ($pages as $page) {
             $navPage = $this->parsePage($page);
-            
+
             if ($page->hasChildren()) {
                 $collection = $page->getChildren();
                 $navChilds  = $this->parse($collection);
-                
+
                 $navPage->addPages($navChilds);
             }
-            
+
             if ($returnArray) {
                 $navigation[] = $navPage;
             } else {
@@ -96,24 +96,24 @@ class Navigation
 
         return $navigation;
     }
-    
+
     /**
      * Parse a single page into a navigation configuration
-     * 
+     *
      * @param  Page $page
      * @return array
-     * @throws Exception\RuntimeException 
+     * @throws Exception\RuntimeException
      */
     public function parsePage(PageInterface $page)
     {
         $meta = $page->getMetaData();
-        
+
         $navPage = Page::factory(array(
             'type'  => 'mvc',
             'route' => (string) $page->getId(),
             'label' => $meta->getNavigationTitle()
         ));
-        
+
         $event = new Event;
         $event->setName(__FUNCTION__ . '.' . $page->getModule());
         $event->setTarget($this);
@@ -122,7 +122,7 @@ class Navigation
             'navigation' => $navPage
         ));
         $this->events->trigger($event);
-        
+
         return $navPage;
     }
 }

@@ -52,7 +52,7 @@ interface MetaDataInterface
     public function getTitle();
     public function getNavigationTitle();
     public function getDescriptiveTitle();
-    
+
     public function getDescription();
     public function getKeywords();
 }

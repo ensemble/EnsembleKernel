@@ -58,12 +58,12 @@ class LoadPage
      * @var EventManager
      */
     protected $events;
-    
+
     /**
      * @var PageService
      */
     protected $pageService;
-    
+
     public function setEventManager(EventManager $eventManager)
     {
         $eventManager->setIdentifiers(array(
@@ -73,26 +73,26 @@ class LoadPage
         ));
         $this->events = $eventManager;
     }
-    
+
     public function setPageService(PageService $service)
     {
         $this->pageService = $service;
     }
-    
+
     public function __invoke(MvcEvent $e)
     {
         $this->loadPage($e);
     }
-    
+
     public function loadPage(MvcEvent $e)
     {
         $routeMatch = $e->getRouteMatch();
         $pageId     = $routeMatch->getParam('page-id', null);
-        
+
         if (null === $pageId) {
             return;
         }
-        
+
         $page = $this->pageService->find($pageId);
         if (!$page instanceof Page) {
             throw new Exception\PageNotFoundException(sprintf(
@@ -100,10 +100,10 @@ class LoadPage
                 $pageId
             ));
         }
-        
+
         $event = new Event(__FUNCTION__, $this, array('page' => $page));
         $this->events->trigger($event);
-        
+
         $e->setParam('page', $page);
     }
 }

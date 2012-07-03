@@ -51,31 +51,31 @@ use Zend\Mvc\MvcEvent as Event;
 class ParseRoutes
 {
     const CACHE_KEY = 'SlmCmfKernel_Listener_ParseRoutes';
-    
+
     protected $cache;
     protected $parser;
-    
+
     public function setCache(Cache $cache)
     {
         $this->cache = $cache;
     }
-    
+
     public function setParser(Parser $parser)
     {
         $this->parser = $parser;
     }
-    
+
     public function __invoke(Event $e)
     {
         if (null === $this->cache || null === ($routes = $this->cache->getItem(self::CACHE_KEY))) {
             $collection = $e->getTarget()->getPageCollection();
             $routes     = $this->parser->parse($collection);
-            
+
             if (null !== $this->cache) {
                 $this->cache->setItem(self::CACHE_KEY, $routes);
             }
         }
-        
+
         $router = $e->getRouter();
         $router->addRoutes($routes);
     }

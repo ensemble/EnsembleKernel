@@ -48,5 +48,5 @@ use ArrayObject;
  */
 class PageCollection extends ArrayObject implements PageCollectionInterface
 {
-    
+
 }
