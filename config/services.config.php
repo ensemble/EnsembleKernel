@@ -55,9 +55,9 @@ return array(
                     'No service manager key provided for an service adapter'
                 );
             }
-            
+
             $service  = $sm->get($config['page_service_class']);
-            
+
             if (!$service instanceof Service\PageInterface) {
                 throw new Exception\PageServiceNotFoundException(
                     'Instance of service adapter does not implement SlmCmfKernel\Service\PageInterface'
@@ -68,21 +68,21 @@ return array(
         'SlmCmfKernel\Listener\ParsePages' => function ($sm) {
             $service  = $sm->get('SlmCmfKernel\Service\Page');
             $events   = $sm->get('EventManager');
-            
+
             $listener = new Listener\ParsePages;
             $listener->setEventManager($events);
             $listener->setPageService($service);
-            
+
             return $listener;
         },
         'SlmCmfKernel\Listener\LoadPage' => function ($sm) {
             $service  = $sm->get('SlmCmfKernel\Service\Page');
             $events   = $sm->get('EventManager');
-            
+
             $listener = new Listener\LoadPage;
             $listener->setEventManager($events);
             $listener->setPageService($service);
-            
+
             return $listener;
         },
         'SlmCmfKernel\Listener\Parse\ParseRoutes' => function ($sm) {
@@ -90,14 +90,14 @@ return array(
 
             $listener = new Listener\Parse\ParseRoutes;
             $listener->setParser($parser);
-            
+
             $config = $sm->get('config');
             if ($config['slmcmf_kernel']['cache_routes']) {
                 $name  = $config['slmcmf_kernel']['cache_routes_key'];
                 $cache = $sm->get($name);
                 $listener->setCache($cache);
             }
-            
+
             return $listener;
         },
         'SlmCmfKernel\Listener\Parse\ParseNavigation' => function ($sm) {
@@ -108,14 +108,32 @@ return array(
             $listener = new Listener\Parse\ParseNavigation;
             $listener->setParser($parser);
             $listener->setViewHelper($helper);
-            
+
             $config = $sm->get('config');
             if ($config['slmcmf_kernel']['cache_navigation']) {
                 $name  = $config['slmcmf_kernel']['cache_navigation_key'];
                 $cache = $sm->get($name);
                 $listener->setCache($cache);
             }
-            
+
+            return $listener;
+        },
+        'SlmCmfKernel\Listener\Load\HeadTitle' => function($sm) {
+            $renderer = $sm->get('Zend\View\Renderer\PhpRenderer');
+            $helper   = $renderer->plugin('headTitle');
+
+            $listener = new Listener\Load\HeadTitle;
+            $listener->setViewHelper($helper);
+
+            return $listener;
+        },
+        'SlmCmfKernel\Listener\Load\SetActive' => function($sm) {
+            $renderer = $sm->get('Zend\View\Renderer\PhpRenderer');
+            $helper   = $renderer->plugin('navigation');
+
+            $listener = new Listener\Load\SetActive;
+            $listener->setViewHelper($helper);
+
             return $listener;
         },
         'SlmCmfKernel\Parser\Route' => function ($sm) {
@@ -128,10 +146,10 @@ return array(
         },
         'SlmCmfKernel\Parser\Navigation' => function ($sm) {
             $events = $sm->get('EventManager');
-            
+
             $parser = new Parser\Navigation;
             $parser->setEventManager($events);
-            
+
             return $parser;
         }
     ),

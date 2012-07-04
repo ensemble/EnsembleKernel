@@ -48,7 +48,7 @@ class Module implements
     Feature\ServiceProviderInterface,
     Feature\ConfigProviderInterface,
     Feature\BootstrapListenerInterface
-{    
+{
     public function getAutoloaderConfig()
     {
         return array(
@@ -62,30 +62,30 @@ class Module implements
             ),
         );
     }
-    
+
     public function getServiceConfiguration()
     {
         return include __DIR__ . '/config/services.config.php';
     }
-    
+
     public function getConfig()
     {
         return include __DIR__ . '/config/module.config.php';
     }
-    
+
     public function onBootstrap(Event $e)
     {
         $app = $e->getParam('application');
         $sm  = $app->getServiceManager();
         $em  = $app->events();
-        
+
         $config = $sm->get('configuration');
         $config = $config['slmcmf_kernel'];
-        
+
         if ($config['pages_parse']) {
             $listener = $sm->get('SlmCmfKernel\Listener\ParsePages');
             $em->attach('route', $listener, 1000);
-            
+
             if ($config['page_load']) {
                 $listener = $sm->get('SlmCmfKernel\Listener\LoadPage');
                 $em->attach('dispatch', $listener, 1000);
@@ -98,6 +98,14 @@ class Module implements
             $navigationListener = $sm->get('SlmCmfKernel\Listener\Parse\ParseNavigation');
             $em->attach('SlmCmfKernel', 'parse', $routeListener);
             $em->attach('SlmCmfKernel', 'parse', $navigationListener);
+
+            // Inject page title into head
+            $headTitleListener  = $sm->get('SlmCmfKernel\Listener\Load\HeadTitle');
+            $em->attach('SlmCmfKernel', 'loadPage', $headTitleListener);
+
+            // Set loaded page to active
+            $setActiveListener  = $sm->get('SlmCmfKernel\Listener\Load\SetActive');
+            $em->attach('SlmCmfKernel', 'loadPage', $setActiveListener);
         }
     }
 }
