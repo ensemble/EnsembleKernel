@@ -39,10 +39,10 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Service;
+namespace Ensemble\Kernel\Service;
 
-use SlmCmfKernel\Model\PageCollectionInterface as PageCollection;
-use SlmCmfKernel\Model\PageInterface as Page;
+use Ensemble\Kernel\Model\PageCollectionInterface as PageCollection;
+use Ensemble\Kernel\Model\PageInterface as Page;
 
 /**
  * Interface for access to repository and mapper features
