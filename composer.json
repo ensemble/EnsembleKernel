@@ -1,13 +1,13 @@
 {
-    "name": "slm-cmf/kernel",
-    "description": "CMF Kernel for the SLM content management system",
+    "name": "ensemble/kernel",
+    "description": "Kernel for the ensemble content management system",
     "type": "library",
-    "license": "Unlicense",
+    "license": "new-bsd",
     "keywords": [
         "cmf",
         "zf2"
     ],
-    "homepage": "https://github.com/juriansluiman/SlmCmfKernel",
+    "homepage": "https://github.com/ensemble/EnsembleKernel",
     "authors": [
         {
             "name": "Jurian Sluiman",
@@ -18,13 +18,14 @@
     "require": {
         "php": ">=5.3.3",
         "zendframework/zendframework": "dev-master",
-        "doctrine/DoctrineORMModule": "dev-master",
-        "gedmo/doctrine-extensions": "dev-master",
-        "slm-cmf/utils": "dev-master"
+        "ensemble/utils": "dev-master"
     },
     "autoload": {
+        "psr-0": {
+            "Ensemble\\Kernel": "src/"
+        },
         "classmap": [
-            "./"
+            "./Module.php"
         ]
     }
 }
