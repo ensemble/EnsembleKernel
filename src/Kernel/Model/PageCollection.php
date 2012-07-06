@@ -39,30 +39,14 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Model;
+namespace Ensemble\Kernel\Model;
+
+use ArrayObject;
 
 /**
- * Description of PageInterface
- *
- * @package    SlmCmfKernel
- * @subpackage Model
+ * Description of PageCollection
  */
-interface PageInterface
+class PageCollection extends ArrayObject implements PageCollectionInterface
 {
-    public function getId();
 
-    public function getParent();
-    public function getChildren();
-    public function hasChildren();
-
-    public function getRoute($includeParentRoute = false);
-    public function setRoute($route);
-    public function getModule();
-    public function setModule($module);
-    public function getModuleId();
-    public function setModuleId($moduleId);
-
-    public function getMetaData();
 }
-
-?>

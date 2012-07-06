@@ -39,54 +39,32 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Listener\Parse;
+namespace Ensemble\Kernel\Listener\Load;
 
-use Zend\Cache\Storage\Adapter\AdapterInterface as Cache;
-use SlmCmfKernel\Parser\Navigation as Parser;
-use Zend\Navigation\Page\Mvc as Page;
+use Zend\EventManager\EventInterface;
 use Zend\View\Helper\Navigation as Helper;
-use Zend\Mvc\MvcEvent as Event;
+use Zend\Navigation\Page\Mvc as Page;
 
 /**
- * Description of ParseNavigation
+ * Description of SetActive
  */
-class ParseNavigation
+class SetActive
 {
-    const CACHE_KEY = 'SlmCmfKernel_Listener_ParseNavigation';
-
-    protected $cache;
-    protected $parser;
     protected $helper;
-
-    public function setCache(Cache $cache)
-    {
-        $this->cache = $cache;
-    }
-
-    public function setParser(Parser $parser)
-    {
-        $this->parser = $parser;
-    }
 
     public function setViewHelper(Helper $helper)
     {
         $this->helper = $helper;
     }
 
-    public function __invoke(Event $e)
+    public function __invoke(EventInterface $e)
     {
-        $router = $e->getRouter();
-        Page::setDefaultRouter($router);
+        $page      = $e->getParam('page');
+        $container = $this->helper->getContainer();
 
-        if (null === $this->cache || null === ($routes = $this->cache->getItem(self::CACHE_KEY))) {
-            $collection = $e->getTarget()->getPageCollection();
-            $navigation = $this->parser->parse($collection);
-
-            if (null !== $this->cache) {
-                $this->cache->setItem(self::CACHE_KEY, $navigation);
-            }
+        $navPage = $container->findOneBy('route', $page->getId());
+        if ($navPage instanceof Page) {
+            $navPage->setActive(true);
         }
-
-        $this->helper->setContainer($navigation);
     }
 }

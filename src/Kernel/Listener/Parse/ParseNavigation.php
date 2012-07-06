@@ -39,71 +39,54 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Listener;
+namespace Ensemble\Kernel\Listener\Parse;
 
-use Zend\EventManager\EventManagerInterface as EventManager;
-use Zend\EventManager\Event;
-use Zend\Mvc\MvcEvent;
-
-use SlmCmfKernel\Model\PageInterface as Page;
-use SlmCmfKernel\Service\PageInterface as PageService;
-use SlmCmfKernel\Exception;
+use Zend\Cache\Storage\Adapter\AdapterInterface as Cache;
+use Ensemble\Kernel\Parser\Navigation as Parser;
+use Zend\Navigation\Page\Mvc as Page;
+use Zend\View\Helper\Navigation as Helper;
+use Zend\Mvc\MvcEvent as Event;
 
 /**
- * Description of ParsePages
+ * Description of ParseNavigation
  */
-class LoadPage
+class ParseNavigation
 {
-    /**
-     * @var EventManager
-     */
-    protected $events;
+    const CACHE_KEY = 'EnsembleKernel_Listener_ParseNavigation';
 
-    /**
-     * @var PageService
-     */
-    protected $pageService;
+    protected $cache;
+    protected $parser;
+    protected $helper;
 
-    public function setEventManager(EventManager $eventManager)
+    public function setCache(Cache $cache)
     {
-        $eventManager->setIdentifiers(array(
-            __CLASS__,
-            get_called_class(),
-            'SlmCmfKernel',
-        ));
-        $this->events = $eventManager;
+        $this->cache = $cache;
     }
 
-    public function setPageService(PageService $service)
+    public function setParser(Parser $parser)
     {
-        $this->pageService = $service;
+        $this->parser = $parser;
     }
 
-    public function __invoke(MvcEvent $e)
+    public function setViewHelper(Helper $helper)
     {
-        $this->loadPage($e);
+        $this->helper = $helper;
     }
 
-    public function loadPage(MvcEvent $e)
+    public function __invoke(Event $e)
     {
-        $routeMatch = $e->getRouteMatch();
-        $pageId     = $routeMatch->getParam('page-id', null);
+        $router = $e->getRouter();
+        Page::setDefaultRouter($router);
 
-        if (null === $pageId) {
-            return;
+        if (null === $this->cache || null === ($routes = $this->cache->getItem(self::CACHE_KEY))) {
+            $collection = $e->getTarget()->getPageCollection();
+            $navigation = $this->parser->parse($collection);
+
+            if (null !== $this->cache) {
+                $this->cache->setItem(self::CACHE_KEY, $navigation);
+            }
         }
 
-        $page = $this->pageService->find($pageId);
-        if (!$page instanceof Page) {
-            throw new Exception\PageNotFoundException(sprintf(
-                'The page could not be found with id %s',
-                $pageId
-            ));
-        }
-
-        $event = new Event(__FUNCTION__, $this, array('page' => $page));
-        $this->events->trigger($event);
-
-        $e->setParam('page', $page);
+        $this->helper->setContainer($navigation);
     }
 }

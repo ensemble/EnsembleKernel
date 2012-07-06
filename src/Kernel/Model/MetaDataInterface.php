@@ -39,12 +39,12 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Model;
+namespace Ensemble\Kernel\Model;
 
 /**
  * Description of MetaDataInterface
  *
- * @package    SlmCmfKernel
+ * @package    Ensemble\Kernel
  * @subpackage Model
  */
 interface MetaDataInterface

@@ -39,14 +39,8 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Model;
+namespace Ensemble\Kernel\Exception;
 
-use ArrayObject;
-
-/**
- * Description of PageCollection
- */
-class PageCollection extends ArrayObject implements PageCollectionInterface
+class PageServiceNotFoundException extends \RuntimeException
 {
-
 }

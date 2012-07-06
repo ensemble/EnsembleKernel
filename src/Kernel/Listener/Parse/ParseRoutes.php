@@ -39,32 +39,44 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Listener\Load;
+namespace Ensemble\Kernel\Listener\Parse;
 
-use Zend\EventManager\EventInterface;
-use Zend\View\Helper\Navigation as Helper;
-use Zend\Navigation\Page\Mvc as Page;
+use Zend\Cache\Storage\Adapter\AdapterInterface as Cache;
+use Ensemble\Kernel\Parser\Route as Parser;
+use Zend\Mvc\MvcEvent as Event;
 
 /**
- * Description of SetActive
+ * Description of ParseRoutes
  */
-class SetActive
+class ParseRoutes
 {
-    protected $helper;
+    const CACHE_KEY = 'EnsembleKernel_Listener_ParseRoutes';
 
-    public function setViewHelper(Helper $helper)
+    protected $cache;
+    protected $parser;
+
+    public function setCache(Cache $cache)
     {
-        $this->helper = $helper;
+        $this->cache = $cache;
     }
 
-    public function __invoke(EventInterface $e)
+    public function setParser(Parser $parser)
     {
-        $page      = $e->getParam('page');
-        $container = $this->helper->getContainer();
+        $this->parser = $parser;
+    }
 
-        $navPage = $container->findOneBy('route', $page->getId());
-        if ($navPage instanceof Page) {
-            $navPage->setActive(true);
+    public function __invoke(Event $e)
+    {
+        if (null === $this->cache || null === ($routes = $this->cache->getItem(self::CACHE_KEY))) {
+            $collection = $e->getTarget()->getPageCollection();
+            $routes     = $this->parser->parse($collection);
+
+            if (null !== $this->cache) {
+                $this->cache->setItem(self::CACHE_KEY, $routes);
+            }
         }
+
+        $router = $e->getRouter();
+        $router->addRoutes($routes);
     }
 }

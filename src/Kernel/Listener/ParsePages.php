@@ -39,44 +39,76 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Listener\Parse;
+namespace Ensemble\Kernel\Listener;
 
-use Zend\Cache\Storage\Adapter\AdapterInterface as Cache;
-use SlmCmfKernel\Parser\Route as Parser;
-use Zend\Mvc\MvcEvent as Event;
+use Zend\EventManager\EventManagerInterface as EventManager;
+use Zend\Mvc\MvcEvent;
+
+use Ensemble\Kernel\Model\PageCollectionInterface as PageCollection;
+use Ensemble\Kernel\Service\PageInterface as PageService;
+use Ensemble\Kernel\Exception;
 
 /**
- * Description of ParseRoutes
+ * Description of ParsePages
  */
-class ParseRoutes
+class ParsePages
 {
-    const CACHE_KEY = 'SlmCmfKernel_Listener_ParseRoutes';
+    /**
+     * @var EventManager
+     */
+    protected $events;
 
-    protected $cache;
-    protected $parser;
+    /**
+     * @var PageService
+     */
+    protected $pageService;
 
-    public function setCache(Cache $cache)
+    /**
+     * @var PageCollection
+     */
+    protected $pageCollection;
+
+    public function setEventManager(EventManager $eventManager)
     {
-        $this->cache = $cache;
+        $eventManager->setIdentifiers(array(
+            __CLASS__,
+            get_called_class(),
+            'SlmCmfKernel',
+        ));
+        $this->events = $eventManager;
     }
 
-    public function setParser(Parser $parser)
+    public function setPageService(PageService $service)
     {
-        $this->parser = $parser;
+        $this->pageService = $service;
     }
 
-    public function __invoke(Event $e)
+    public function __invoke(MvcEvent $e)
     {
-        if (null === $this->cache || null === ($routes = $this->cache->getItem(self::CACHE_KEY))) {
-            $collection = $e->getTarget()->getPageCollection();
-            $routes     = $this->parser->parse($collection);
+        $this->parse($e);
+    }
 
-            if (null !== $this->cache) {
-                $this->cache->setItem(self::CACHE_KEY, $routes);
-            }
+    public function parse(MvcEvent $e)
+    {
+        $event  = clone($e);
+        $event->setName(__FUNCTION__);
+        $event->setTarget($this);
+
+        $this->events->trigger($event);
+    }
+
+    public function getPageCollection()
+    {
+        if ($this->pageCollection instanceof PageCollection) {
+            return $this->pageCollection;
         }
 
-        $router = $e->getRouter();
-        $router->addRoutes($routes);
+        $pages  = $this->pageService->getTree();
+        if (!$pages instanceof PageCollection) {
+            throw new Exception\PageNotFoundException('Collection not found');
+        }
+
+        $this->pageCollection = $pages;
+        return $this->pageCollection;
     }
 }

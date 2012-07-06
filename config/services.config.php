@@ -39,17 +39,17 @@
  * @link        http://ensemble.github.com
  */
 
-use SlmCmfKernel\Listener;
-use SlmCmfKernel\Parser;
-use SlmCmfKernel\Service;
+use Ensemble\Kernel\Listener;
+use Ensemble\Kernel\Parser;
+use Ensemble\Kernel\Service;
 
-use SlmCmfKernel\Exception;
+use Ensemble\Kernel\Exception;
 
 return array(
     'factories' => array(
-        'SlmCmfKernel\Service\Page' => function ($sm) {
+        'Ensemble\Kernel\Service\Page' => function ($sm) {
             $config   = $sm->get('config');
-            $config   = $config['slmcmf_kernel'];
+            $config   = $config['ensemble_kernel'];
             if (empty($config['page_service_class'])) {
                 throw new Exception\PageServiceNotFoundException(
                     'No service manager key provided for an service adapter'
@@ -60,13 +60,13 @@ return array(
 
             if (!$service instanceof Service\PageInterface) {
                 throw new Exception\PageServiceNotFoundException(
-                    'Instance of service adapter does not implement SlmCmfKernel\Service\PageInterface'
+                    'Instance of service adapter does not implement Ensemble\Kernel\Service\PageInterface'
                 );
             }
             return $service;
         },
-        'SlmCmfKernel\Listener\ParsePages' => function ($sm) {
-            $service  = $sm->get('SlmCmfKernel\Service\Page');
+        'Ensemble\Kernel\Listener\ParsePages' => function ($sm) {
+            $service  = $sm->get('Ensemble\Kernel\Service\Page');
             $events   = $sm->get('EventManager');
 
             $listener = new Listener\ParsePages;
@@ -75,8 +75,8 @@ return array(
 
             return $listener;
         },
-        'SlmCmfKernel\Listener\LoadPage' => function ($sm) {
-            $service  = $sm->get('SlmCmfKernel\Service\Page');
+        'Ensemble\Kernel\Listener\LoadPage' => function ($sm) {
+            $service  = $sm->get('Ensemble\Kernel\Service\Page');
             $events   = $sm->get('EventManager');
 
             $listener = new Listener\LoadPage;
@@ -85,23 +85,23 @@ return array(
 
             return $listener;
         },
-        'SlmCmfKernel\Listener\Parse\ParseRoutes' => function ($sm) {
-            $parser   = $sm->get('SlmCmfKernel\Parser\Route');
+        'Ensemble\Kernel\Listener\Parse\ParseRoutes' => function ($sm) {
+            $parser   = $sm->get('Ensemble\Kernel\Parser\Route');
 
             $listener = new Listener\Parse\ParseRoutes;
             $listener->setParser($parser);
 
             $config = $sm->get('config');
-            if ($config['slmcmf_kernel']['cache_routes']) {
-                $name  = $config['slmcmf_kernel']['cache_routes_key'];
+            if ($config['ensemble_kernel']['cache_routes']) {
+                $name  = $config['ensemble_kernel']['cache_routes_key'];
                 $cache = $sm->get($name);
                 $listener->setCache($cache);
             }
 
             return $listener;
         },
-        'SlmCmfKernel\Listener\Parse\ParseNavigation' => function ($sm) {
-            $parser   = $sm->get('SlmCmfKernel\Parser\Navigation');
+        'Ensemble\Kernel\Listener\Parse\ParseNavigation' => function ($sm) {
+            $parser   = $sm->get('Ensemble\Kernel\Parser\Navigation');
             $renderer = $sm->get('Zend\View\Renderer\PhpRenderer');
             $helper   = $renderer->plugin('navigation');
 
@@ -110,15 +110,15 @@ return array(
             $listener->setViewHelper($helper);
 
             $config = $sm->get('config');
-            if ($config['slmcmf_kernel']['cache_navigation']) {
-                $name  = $config['slmcmf_kernel']['cache_navigation_key'];
+            if ($config['ensemble_kernel']['cache_navigation']) {
+                $name  = $config['ensemble_kernel']['cache_navigation_key'];
                 $cache = $sm->get($name);
                 $listener->setCache($cache);
             }
 
             return $listener;
         },
-        'SlmCmfKernel\Listener\Load\HeadTitle' => function($sm) {
+        'Ensemble\Kernel\Listener\Load\HeadTitle' => function($sm) {
             $renderer = $sm->get('Zend\View\Renderer\PhpRenderer');
             $helper   = $renderer->plugin('headTitle');
 
@@ -127,7 +127,7 @@ return array(
 
             return $listener;
         },
-        'SlmCmfKernel\Listener\Load\SetActive' => function($sm) {
+        'Ensemble\Kernel\Listener\Load\SetActive' => function($sm) {
             $renderer = $sm->get('Zend\View\Renderer\PhpRenderer');
             $helper   = $renderer->plugin('navigation');
 
@@ -136,7 +136,7 @@ return array(
 
             return $listener;
         },
-        'SlmCmfKernel\Parser\Route' => function ($sm) {
+        'Ensemble\Kernel\Parser\Route' => function ($sm) {
             $config = $sm->get('config');
             $routes = $config['cmf_routes'];
 
@@ -144,7 +144,7 @@ return array(
             $parser->setModuleRoutes($routes);
             return $parser;
         },
-        'SlmCmfKernel\Parser\Navigation' => function ($sm) {
+        'Ensemble\Kernel\Parser\Navigation' => function ($sm) {
             $events = $sm->get('EventManager');
 
             $parser = new Parser\Navigation;

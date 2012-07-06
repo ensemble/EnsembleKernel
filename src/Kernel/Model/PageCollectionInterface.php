@@ -39,8 +39,18 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Exception;
+namespace Ensemble\Kernel\Model;
 
-class PageServiceNotFoundException extends \RuntimeException
+use IteratorAggregate;
+use Serializable;
+use Countable;
+
+/**
+ * Collection of Pages
+ */
+interface PageCollectionInterface extends
+    IteratorAggregate,
+    Serializable,
+    Countable
 {
 }

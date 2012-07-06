@@ -39,8 +39,30 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Exception;
+namespace Ensemble\Kernel\Model;
 
-class PageNotFoundException extends \RuntimeException
+/**
+ * Description of PageInterface
+ *
+ * @package    Ensemble\Kernel
+ * @subpackage Model
+ */
+interface PageInterface
 {
+    public function getId();
+
+    public function getParent();
+    public function getChildren();
+    public function hasChildren();
+
+    public function getRoute($includeParentRoute = false);
+    public function setRoute($route);
+    public function getModule();
+    public function setModule($module);
+    public function getModuleId();
+    public function setModuleId($moduleId);
+
+    public function getMetaData();
 }
+
+?>

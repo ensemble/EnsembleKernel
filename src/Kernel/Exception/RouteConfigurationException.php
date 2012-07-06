@@ -39,7 +39,7 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Exception;
+namespace Ensemble\Kernel\Exception;
 
 class RouteConfigurationException extends \RuntimeException
 {

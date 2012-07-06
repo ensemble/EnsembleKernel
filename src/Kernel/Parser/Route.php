@@ -39,13 +39,13 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Parser;
+namespace Ensemble\Kernel\Parser;
 
-use SlmCmfKernel\Model\PageCollectionInterface;
-use SlmCmfKernel\Model\PageCollection;
-use SlmCmfKernel\Model\PageInterface as Page;
+use Ensemble\Kernel\Model\PageCollectionInterface;
+use Ensemble\Kernel\Model\PageCollection;
+use Ensemble\Kernel\Model\PageInterface as Page;
 
-use SlmCmfKernel\Exception;
+use Ensemble\Kernel\Exception;
 
 /**
  * Description of Route

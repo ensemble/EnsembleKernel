@@ -39,7 +39,7 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Listener\Load;
+namespace Ensemble\Kernel\Listener\Load;
 
 use Zend\View\Helper\HeadTitle as Helper;
 use Zend\EventManager\EventInterface;

@@ -39,18 +39,8 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Model;
+namespace Ensemble\Kernel\Exception;
 
-use IteratorAggregate;
-use Serializable;
-use Countable;
-
-/**
- * Collection of Pages
- */
-interface PageCollectionInterface extends
-    IteratorAggregate,
-    Serializable,
-    Countable
+class PageNotFoundException extends \RuntimeException
 {
 }

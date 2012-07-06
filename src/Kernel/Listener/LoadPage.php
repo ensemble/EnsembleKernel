@@ -39,90 +39,71 @@
  * @link        http://ensemble.github.com
  */
 
-namespace SlmCmfKernel\Parser;
+namespace Ensemble\Kernel\Listener;
 
 use Zend\EventManager\EventManagerInterface as EventManager;
 use Zend\EventManager\Event;
-use Zend\Navigation\Navigation as Collection;
-use Zend\Navigation\Page\Mvc as Page;
+use Zend\Mvc\MvcEvent;
 
-use SlmCmfKernel\Model\PageCollectionInterface;
-use SlmCmfKernel\Model\PageCollection;
-use SlmCmfKernel\Model\PageInterface;
-
-use SlmCmfKernel\Exception;
+use Ensemble\Kernel\Model\PageInterface as Page;
+use Ensemble\Kernel\Service\PageInterface as PageService;
+use Ensemble\Kernel\Exception;
 
 /**
- * Description of Navigation
+ * Description of ParsePages
  */
-class Navigation
+class LoadPage
 {
     /**
      * @var EventManager
      */
     protected $events;
 
-    public function setEventManager(EventManager $events)
+    /**
+     * @var PageService
+     */
+    protected $pageService;
+
+    public function setEventManager(EventManager $eventManager)
     {
-        $this->events = $events;
+        $eventManager->setIdentifiers(array(
+            __CLASS__,
+            get_called_class(),
+            'SlmCmfKernel',
+        ));
+        $this->events = $eventManager;
     }
 
-    /**
-     * Parse a PageCollection into a navigation structure
-     *
-     * @param  PageCollection $pages
-     * @return array
-     */
-    public function parse(PageCollectionInterface $pages, $returnArray = false)
+    public function setPageService(PageService $service)
     {
-        $navigation = ($returnArray) ? array() : new Collection;
+        $this->pageService = $service;
+    }
 
-        foreach ($pages as $page) {
-            $navPage = $this->parsePage($page);
+    public function __invoke(MvcEvent $e)
+    {
+        $this->loadPage($e);
+    }
 
-            if ($page->hasChildren()) {
-                $collection = $page->getChildren();
-                $navChilds  = $this->parse($collection);
+    public function loadPage(MvcEvent $e)
+    {
+        $routeMatch = $e->getRouteMatch();
+        $pageId     = $routeMatch->getParam('page-id', null);
 
-                $navPage->addPages($navChilds);
-            }
-
-            if ($returnArray) {
-                $navigation[] = $navPage;
-            } else {
-                $navigation->addPage($navPage);
-            }
+        if (null === $pageId) {
+            return;
         }
 
-        return $navigation;
-    }
+        $page = $this->pageService->find($pageId);
+        if (!$page instanceof Page) {
+            throw new Exception\PageNotFoundException(sprintf(
+                'The page could not be found with id %s',
+                $pageId
+            ));
+        }
 
-    /**
-     * Parse a single page into a navigation configuration
-     *
-     * @param  Page $page
-     * @return array
-     * @throws Exception\RuntimeException
-     */
-    public function parsePage(PageInterface $page)
-    {
-        $meta = $page->getMetaData();
-
-        $navPage = Page::factory(array(
-            'type'  => 'mvc',
-            'route' => (string) $page->getId(),
-            'label' => $meta->getNavigationTitle()
-        ));
-
-        $event = new Event;
-        $event->setName(__FUNCTION__ . '.' . $page->getModule());
-        $event->setTarget($this);
-        $event->setParams(array(
-            'page'       => $page,
-            'navigation' => $navPage
-        ));
+        $event = new Event(__FUNCTION__, $this, array('page' => $page));
         $this->events->trigger($event);
 
-        return $navPage;
+        $e->setParam('page', $page);
     }
 }
