@@ -65,6 +65,16 @@ return array(
             }
             return $service;
         },
+        'Ensemble\Kernel\Listener\DefaultListenerAggregate' => function ($sm) {
+            $config = $sm->get('configuration');
+            $config = $config['ensemble_kernel'];
+
+            $listener  = new Listener\DefaultListenerAggregate;
+            $listener->setConfig($config);
+            $listener->setServiceManager($sm);
+
+            return $listener;
+        },
         'Ensemble\Kernel\Listener\ParsePages' => function ($sm) {
             $service  = $sm->get('Ensemble\Kernel\Service\Page');
             $events   = $sm->get('EventManager');

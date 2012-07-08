@@ -57,7 +57,7 @@ class Module implements
             ),
             'Zend\Loader\StandardAutoloader' => array(
                 'namespaces' => array(
-                    __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
+                    __NAMESPACE__ => __DIR__ . '/src/Kernel',
                 ),
             ),
         );
@@ -77,35 +77,9 @@ class Module implements
     {
         $app = $e->getParam('application');
         $sm  = $app->getServiceManager();
-        $em  = $app->events();
+        $em  = $app->getEventManager();
 
-        $config = $sm->get('configuration');
-        $config = $config['ensemble_kernel'];
-
-        if ($config['pages_parse']) {
-            $listener = $sm->get('Ensemble\Kernel\Listener\ParsePages');
-            $em->attach('route', $listener, 1000);
-
-            if ($config['page_load']) {
-                $listener = $sm->get('Ensemble\Kernel\Listener\LoadPage');
-                $em->attach('dispatch', $listener, 1000);
-            }
-
-            $em = $em->getSharedManager();
-
-            // Parse page tree for routes and navigation structure
-            $routeListener      = $sm->get('Ensemble\Kernel\Listener\Parse\ParseRoutes');
-            $navigationListener = $sm->get('Ensemble\Kernel\Listener\Parse\ParseNavigation');
-            $em->attach('Ensemble\Kernel', 'parse', $routeListener);
-            $em->attach('Ensemble\Kernel', 'parse', $navigationListener);
-
-            // Inject page title into head
-            $headTitleListener  = $sm->get('Ensemble\Kernel\Listener\Load\HeadTitle');
-            $em->attach('Ensemble\Kernel', 'loadPage', $headTitleListener);
-
-            // Set loaded page to active
-            $setActiveListener  = $sm->get('Ensemble\Kernel\Listener\Load\SetActive');
-            $em->attach('Ensemble\Kernel', 'loadPage', $setActiveListener);
-        }
+        $listener  = $sm->get('Ensemble\Kernel\Listener\DefaultListenerAggregate');
+        $listener->attach($em);
     }
 }
