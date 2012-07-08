@@ -69,7 +69,7 @@ class LoadPage
         $eventManager->setIdentifiers(array(
             __CLASS__,
             get_called_class(),
-            'SlmCmfKernel',
+            'Ensemble\Kernel',
         ));
         $this->events = $eventManager;
     }
