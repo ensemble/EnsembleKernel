@@ -73,7 +73,7 @@ class Module implements
         return include __DIR__ . '/config/module.config.php';
     }
 
-    public function onBootstrap(Event $e)
+    public function onBootstrap(EventInterface $e)
     {
         $app = $e->getParam('application');
         $sm  = $app->getServiceManager();
