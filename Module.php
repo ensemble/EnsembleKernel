@@ -41,7 +41,7 @@
 namespace Ensemble\Kernel;
 
 use Zend\ModuleManager\Feature;
-use Zend\EventManager\Event;
+use Zend\EventManager\EventInterface;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
