@@ -42,6 +42,7 @@ namespace Ensemble\Kernel;
 
 use Zend\ModuleManager\Feature;
 use Zend\EventManager\EventInterface;
+use Zend\Http\Request as HttpRequest;
 
 class Module implements
     Feature\AutoloaderProviderInterface,
@@ -79,7 +80,15 @@ class Module implements
         $sm  = $app->getServiceManager();
         $em  = $app->getEventManager();
 
-        $listener  = $sm->get('Ensemble\Kernel\Listener\DefaultListenerAggregate');
-        $listener->attach($em);
+        /**
+         * We only load listeners when we are in HTTP
+         *
+         * When bootstrapping CLI apps, we should not use the default listeners
+         * which require on HTTP classes.
+         */
+        if ($app->getRequest() instanceof HttpRequest) {
+            $listener  = $sm->get('Ensemble\Kernel\Listener\DefaultListenerAggregate');
+            $listener->attach($em);
+        }
     }
 }

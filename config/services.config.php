@@ -113,6 +113,7 @@ return array(
         'Ensemble\Kernel\Listener\Parse\ParseNavigation' => function ($sm) {
             $parser   = $sm->get('Ensemble\Kernel\Parser\Navigation');
             $renderer = $sm->get('Zend\View\Renderer\PhpRenderer');
+
             $helper   = $renderer->plugin('navigation');
 
             $listener = new Listener\Parse\ParseNavigation;
