@@ -109,9 +109,10 @@ class Navigation
         $meta = $page->getMetaData();
 
         $navPage = Page::factory(array(
-            'type'  => 'mvc',
-            'route' => (string) $page->getId(),
-            'label' => $meta->getNavigationTitle()
+            'type'    => 'mvc',
+            'route'   => (string) $page->getId(),
+            'label'   => $meta->getNavigationTitle(),
+            'visible' => $page->isVisible()
         ));
 
         $event = new Event;
