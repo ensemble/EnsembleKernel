@@ -41,7 +41,7 @@
 
 namespace Ensemble\Kernel\Listener\Parse;
 
-use Zend\Cache\Storage\Adapter\AdapterInterface as Cache;
+use Zend\Cache\Storage\StorageInterface as Cache;
 use Ensemble\Kernel\Parser\Route as Parser;
 use Zend\Mvc\MvcEvent as Event;
 

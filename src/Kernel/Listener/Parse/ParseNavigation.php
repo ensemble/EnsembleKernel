@@ -41,7 +41,7 @@
 
 namespace Ensemble\Kernel\Listener\Parse;
 
-use Zend\Cache\Storage\Adapter\AdapterInterface as Cache;
+use Zend\Cache\Storage\StorageInterface as Cache;
 use Ensemble\Kernel\Parser\Navigation as Parser;
 use Zend\Navigation\Page\Mvc as Page;
 use Zend\View\Helper\Navigation as Helper;
@@ -78,7 +78,7 @@ class ParseNavigation
         $router = $e->getRouter();
         Page::setDefaultRouter($router);
 
-        if (null === $this->cache || null === ($routes = $this->cache->getItem(self::CACHE_KEY))) {
+        if (null === $this->cache || null === ($navigation = $this->cache->getItem(self::CACHE_KEY))) {
             $collection = $e->getTarget()->getPageCollection();
             $navigation = $this->parser->parse($collection);
 
