@@ -149,7 +149,7 @@ return array(
         },
         'Ensemble\Kernel\Parser\Route' => function ($sm) {
             $config = $sm->get('config');
-            $routes = $config['cmf_routes'];
+            $routes = $config['ensemble_kernel']['routes'];
 
             $parser = new Parser\Route;
             $parser->setModuleRoutes($routes);
