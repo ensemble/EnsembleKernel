@@ -65,6 +65,10 @@ class Navigation
     public function setEventManager(EventManager $events)
     {
         $this->events = $events;
+        $this->events->setIdentifiers(array(
+            __CLASS__,
+            get_called_class()
+        ));
     }
 
     /**
